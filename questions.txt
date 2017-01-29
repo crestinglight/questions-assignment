@@ -1,6 +1,0 @@
-Can you tell me more about key/value pairs?
-When is it appropriate to create a new class?
-What does REPL stand for?
-What would be an example of non-OOP?
-What's the point of using Ruby to read a text file?
-Does this class thing work the same way in JS?
