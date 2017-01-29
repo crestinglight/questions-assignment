@@ -1,0 +1,107 @@
+The following is a tutorial for beginners to Ruby, in order to teach how we can create a Ruby file that will read back our questions that we have, add new questions that we input, or remove irrelevant questions that we now have answers to, all without opening the original .text file! Here, we'll begin setting up our files, permissions, and our algorithmic thinking of how to approach the issue.
+
+Step 1: First we need to create our questions.txt file. In this file we will list questions that we would like answers to. Open the terminal, and type this command into the command line: "~". This will reset your position to your home directory. Next, enter the command "subl questions.txt". This will launch Sublime Text and open a new file called "questions.txt", where you can type each question on it's own line. When you've written out your questions, save the file, and close it.
+
+Step 2: Now we need to set up our Ruby file that we will use to read, write, and remove questions from our text file. In the command line, go to the folder where you would like to keep your Ruby file. This can be anywhere you'd like. Once you are in the correct folder, type the command "subl questions.rb". This will launch a new file with the Ruby extension. Press Ctrl+S or Command+S to save.
+
+Step 3: We would like to be able to open this file from anywhere in the command line by simply typing in "questions". Start by copying and pasting this line into your questions.rb file as the first line: "#!/usr/bin/env ruby" (without the double quotes). Go back to the command line, and make sure you are in the same directory with your Ruby file in it. We now need to change the name of our file by typing in "mv questions.rb questions". This will rename the file with no extension so that we can just type "questions" into our command line later to call it. We need to change the permissions so that we are able to read, write, and execute this file, and we do this by entering the command "chmod 755 questions". Next, we need to make a shortcut to this file by typing in "ln -s $PWD/questions /usr/local/bin". You should now be able to call your file by simply typing "questions" into the command line from anywhere. You can test this by entering this line into your questions file, then typing "questions" into the command line:
+puts "Hello!"
+
+Step 4: Now we need to think about what steps we need to take in our algorithmic thinking in order to get our file to do what we want it to do. First, our code should open the existing file and read the questions that are currently there. Next, our program needs to check for user input. Did the user type "questions add "What kind of bear is best?"", did the user want to remove a question from the list? Did they simply want those questions read out to them in the terminal? The program should look for this and respond accordingly. The next step should be to respond to the user input. If the user wants to add a new question, we need to move on to a function that does that. If the user wants to remove a question, the program should move on to a function that completes this command. If the user simply wants the questions read to them, we can skip straight to ouput. The next function should number the updated list of questions accordingly then print them to the console. Finally, we want to write the updated list of questions back to the questions.txt file, so that it can save our progress!
+
+Let's get in to the actual code now!
+
+Step 1: First, we want to get a variable that we can work with that is a list of the original questions in the file. We should do this by setting up a variable called originalQuestions, and setting it equal to a function we will create called readQuestions. Let's take a look at that function.
+
+def readQuestions
+	textLinesArray = []
+	File.open("YOUR FULL PATH TO THE TEXT FILE", 'r').each do |textLine|
+		textLinesArray.push(textLine)
+	end
+	return textLinesArray
+end
+
+While this function may look complicated, it is actually relatively simple when we break it down. "readQuestions" is the name of our function. textLinesArray is an empty array, or an empty list, that we are getting ready to push our questions into. From here, we need to open the file and read each line of that file. By putting the "textLinesArray.push(textLine)" between the File.open line and the "end" line, we are telling the program to push each line into our empty textLinesArray list. By the time this is finished executing, we return a new list that has all of our original, unedited questions inside!
+Be sure to test your code as you go along. As your last line of code, you can type "puts originalQuestions" and save the file. Run "questions" from any directory in your command line. You should see all of your original questions from the text file printed in the terminal!
+
+Step 2: Below our originalQuestions declaration, we need to declare another variable - allQuestions. This will be the final list of questions with any additions or removals that the user has requested. We should set allQuestions = checkUserInput(originalQuestions). This means that we are passing our new variable, originalQuestions, into this function, so that we can get our finished list out. Let's take a look at this function:
+
+def checkUserInput(initialQuestions)
+	args = ARGV
+	if args.length > 0 && args[0] == "add"
+		return addNewQuestion(initialQuestions, args)
+	end
+		
+	if args.length > 0 && args[0] == "rm"
+		return removeQuestion(initialQuestions, args)
+	end
+
+	if args.length == 0
+		return initialQuestions
+	end
+end
+
+Again, we can break this function down into simple steps that are easy to understand. ARGV is a ruby method that gives us the user input as an array. If the user typed in "questions apple banana orange pear", ARGV would come back as ["apple", "banana", "orange", "pear"]. However, if the user simply types "questions" into the command line, ARGV will simply return an empty array. We've established that for now, the user must type in the format: questions add "QUESTION", or: questions rm NUMBER. So for now, we'll tailor our program for these inputs.
+You'll notice three if statements in this function. These are going to direct our program where to go next. Think of a 3-prong fork-in-the-road, and these are our signs telling the program which road to take.
+If args (ARGV) returns an array that has more than 0 items, AND the first item in that array (index 0) is "add", then we move on to function "addNewQuestion".
+If args returns an array that has more than 0 items, AND the first item in that array is "rm", then we move on to function "removeQuestion".
+If args returns an empty array, this means the user just typed in "questions", so the program can simply return the list of original questions we already had! No new function necessary.
+
+Step 3: Now, let's set up our function that takes care of adding new questions:
+
+def addNewQuestion(inputQuestions, userInput)
+	newQuestion = userInput[1]
+	inputQuestions.push(newQuestion + "\n")
+	return inputQuestions
+end
+
+Seeing as we are setting this program up for a specific format of input, we can assume that the ARGV will return an array with two items in the array: ["add", "QUESTION"]. So we know we want to add the second item in the list (index 1) to our finished list of questions. We do this easily by setting newQuestion equal to our ARGV list index 1, then pushing it to the end of our original list. The "+ "\n"" simply means we are adding a new line to the end of the question, as the program does not do this by default. Our updated list is returned, and we are done with this function!
+
+Step 4: Now we'll set up our removeQuestion function:
+
+def removeQuestion(inputQuestions, userInput)
+	inputQuestions.delete_at(userInput[1].to_f - 1)
+	return inputQuestions
+end
+
+Ruby has a wonderful built-in function called ".delete_at", wherein we can tell ruby which index number we would like deleted from an array, and it will handle the heavy lifting. Keep in mind that the first item is at index 0, and the second item is at index 1, so we need to put "-1" in our calculation. When the user types in "questions rm 3", they expect the third question to be deleted!
+
+Step 5: Keep in mind, these questions do not have numbers attached to them yet! Now that we have our final list of questions ready to work with, we need to print them. Whether the user is adding, removing, or viewing the questions, we always want them to print in a numbered order. We do this with a function called numberQuestions:
+
+def numberQuestions(questions)
+	for i in 0..questions.length-1
+		puts (i + 1).to_s + ". " + questions[i]
+	end
+end
+
+Note: Be sure to call this function below your line of code that declares allQuestions, and make sure to pass (allQuestions) into this function!
+This function is simply our output for our updated list of questions. As we loop through each string, or each question, in our index, we give that question the proper number, and print the question after it.
+
+Step 6: The last step, yay! We need to set up a function that will rewrite the original text file with the final list of questions we have from the user input. We do that with a final function called, you guessed it, rewriteFile:
+
+def rewriteFile(allQuestions)
+	finalQuestions = ""
+	for i in 0..allQuestions.length-1
+		finalQuestions = finalQuestions + allQuestions[i]
+	end
+	newFile = File.open("/Users/evingrost/test.txt", 'w')
+	newFile.write(finalQuestions)
+	newFile.close
+end
+
+This function does a few things, but is still relatively simple. First, we start with an empty string that we will push all of our strings (questions) into. For each question, we want to add it to the string. Luckily, when you are pushing strings from an array into an empty string, ruby automatically puts a new line at the end of each string, so we don't need to worry about "\n"! Once we have pushed the questions into a new string, we want to open our new file, which will be a rewritten version of our list of questions. The ".write" writes over anything that is in a text file, so be careful with its use! In this case, we want to rewrite over the original, seeing as this is a full list of our questions, but you could end up permanently erasing information from a text file if you use this command incorrectly. Make sure you finish up with ".close" to make sure the text file isn't open and running in the background.
+
+Congratulations, you're done!
+
+
+
+
+
+
+
+
+
+
+
+
+

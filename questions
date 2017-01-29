@@ -1,0 +1,80 @@
+#!/usr/bin/env ruby
+require 'pry'
+
+
+def readQuestions
+	textLinesArray = []
+	File.open("/Users/evingrost/questions.txt", 'r').each do |textLine|
+		textLinesArray.push(textLine)
+	end
+	return textLinesArray
+end
+
+
+def checkUserInput(initialQuestions)
+	args = ARGV
+	if args.length > 0 && args[0] == "add"
+		return addNewQuestion(initialQuestions, args)
+	end
+		
+	if args.length > 0 && args[0] == "rm"
+		return removeQuestion(initialQuestions, args)
+	end
+
+	if args.length == 0
+		return initialQuestions
+	end
+end
+
+def addNewQuestion(inputQuestions, userInput)
+	newQuestion = userInput[1]
+	inputQuestions.push(newQuestion + "\n")
+	return inputQuestions
+end
+
+def removeQuestion(inputQuestions, userInput)
+	inputQuestions.delete_at(userInput[1].to_f - 1)
+	return inputQuestions
+end
+
+def numberQuestions(questions)
+	for i in 0..questions.length-1
+		puts (i + 1).to_s + ". " + questions[i]
+	end
+end
+
+def rewriteFile(allQuestions)
+	finalQuestions = ""
+	for i in 0..allQuestions.length-1
+		finalQuestions = finalQuestions + allQuestions[i]
+	end
+	newFile = File.open("/Users/evingrost/test.txt", 'w')
+	newFile.write(finalQuestions)
+	newFile.close
+end
+
+originalQuestions = readQuestions
+allQuestions = checkUserInput(originalQuestions)
+numberQuestions(allQuestions)
+rewriteFile(allQuestions)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
