@@ -23,6 +23,9 @@ def checkUserInput(initialQuestions)
 
 	if args.length == 0
 		return initialQuestions
+
+	else
+		invalidInput
 	end
 end
 
@@ -53,11 +56,14 @@ def rewriteFile(allQuestions)
 	newFile.close
 end
 
+def invalidInput
+	abort("Sorry, that's not a valid input." + "\n")
+end
+
 originalQuestions = readQuestions
 allQuestions = checkUserInput(originalQuestions)
 numberQuestions(allQuestions)
 rewriteFile(allQuestions)
-
 
 
 
